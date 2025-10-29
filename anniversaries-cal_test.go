@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -56,16 +57,16 @@ func TestCalculateInterestingDates(t *testing.T) {
 	has10kDays := false
 
 	for _, d := range dates {
-		if contains(d.Description, "half the age") {
+		if strings.Contains(d.Description, "half the age") {
 			hasHalfAge = true
 		}
-		if contains(d.Description, "2^") {
+		if strings.Contains(d.Description, "2^") {
 			hasPowerOf2 = true
 		}
-		if contains(d.Description, "marriage anniversary") {
+		if strings.Contains(d.Description, "marriage anniversary") {
 			hasMarriageAnniversary = true
 		}
-		if contains(d.Description, "10,000 days") {
+		if strings.Contains(d.Description, "10,000 days") {
 			has10kDays = true
 		}
 	}
@@ -82,19 +83,6 @@ func TestCalculateInterestingDates(t *testing.T) {
 	if !has10kDays {
 		t.Error("Expected 10,000 days birthday")
 	}
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > len(substr) && findSubstring(s, substr))
-}
-
-func findSubstring(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }
 
 func TestLoadConfig(t *testing.T) {

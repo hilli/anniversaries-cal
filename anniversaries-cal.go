@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/uniplaces/carbon"
@@ -399,7 +399,7 @@ func calculateInterestingDates(config Config) []InterestingDate {
 }
 
 func loadConfig(filename string) (*Config, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -451,14 +451,9 @@ func main() {
 	interestingDates := calculateInterestingDates(*config)
 
 	// Sort dates by how soon they occur
-	// Simple bubble sort for demonstration
-	for i := 0; i < len(interestingDates)-1; i++ {
-		for j := 0; j < len(interestingDates)-i-1; j++ {
-			if interestingDates[j].Date.After(interestingDates[j+1].Date) {
-				interestingDates[j], interestingDates[j+1] = interestingDates[j+1], interestingDates[j]
-			}
-		}
-	}
+	sort.Slice(interestingDates, func(i, j int) bool {
+		return interestingDates[i].Date.Before(interestingDates[j].Date)
+	})
 
 	// Display interesting dates
 	fmt.Println("=== Interesting Dates Calendar ===")
