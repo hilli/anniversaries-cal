@@ -9,6 +9,8 @@ The program calculates and displays various "interesting dates" including:
 ### For People (Birthdates)
 - **10,000 days birthday** - When someone reaches 10,000 days old
 - **20,000 days birthday** - When someone reaches 20,000 days old
+- **30,000 days birthday** - When someone reaches 30,000 days old
+- **Yearly birthdays** - Annual birthdays up to 100 years
 - **100 months birthday** - When someone reaches 100 months old
 - **500 months birthday** - When someone reaches 500 months old
 - **1,000 weeks birthday** - When someone reaches 1,000 weeks old
@@ -21,14 +23,17 @@ The program calculates and displays various "interesting dates" including:
 ### For Events
 - **Powers of 2 days** - Calculates dates that are 2^N days (e.g., 2^10=1024, 2^11=2048, 2^12=4096 days) after an event
 - **Round year anniversaries** - 5, 10, 25, 50, 75, and 100 year anniversaries
+- **Yearly anniversaries** - Annual anniversaries up to 100 years
 - **1 million minutes** - Exactly 1,000,000 minutes after an event
 - **100,000 hours** - Exactly 100,000 hours after an event
 - **Prime number days** - Days matching prime numbers (1009, 2003, 3001, 5003, 7001, 10007)
 
 ### For Marriages
-- **Year anniversaries** - Tracks marriage anniversaries by year
+- **Year anniversaries** - Tracks marriage/relationship anniversaries up to 100 years
+- **Bronze anniversary** - 12.5 years (4,563 days) together
 - **Traditional anniversary names** - Paper (1st), Wood (5th), Tin (10th), Crystal (15th), China (20th), Silver (25th), Pearl (30th), Ruby (40th), Golden (50th), Diamond (60th)
-- **100 months anniversary** - When a couple reaches 100 months of marriage
+- **Custom relationship types** - Optional ability to label relationships (e.g., "couple", "partnership" instead of "marriage")
+- **100 months anniversary** - When a couple reaches 100 months together
 - **Days together milestones** - 1,000, 5,000, and 10,000 days together
 - **Weeks together milestones** - 100 and 500 weeks together
 
@@ -41,9 +46,26 @@ go build
 # Run with default config file (anniversaries.yaml)
 ./anniversaries-cal
 
-# Run with custom config file
+# Run with custom config file using -c flag
+./anniversaries-cal -c my-dates.yaml
+
+# Run with custom config file using --config flag
+./anniversaries-cal --config my-dates.yaml
+
+# Run with custom config file (backwards compatible)
 ./anniversaries-cal my-dates.yaml
+
+# Export to iCal format
+./anniversaries-cal --ical anniversaries.ics
+
+# Combine config and iCal export
+./anniversaries-cal -c my-dates.yaml --ical my-calendar.ics
 ```
+
+### Command-Line Options
+
+- `-c, --config <file>`: Specify the path to a YAML configuration file (default: `anniversaries.yaml`)
+- `--ical <file>`: Export all interesting dates to an iCal file for use with calendar applications (optional)
 
 ## Configuration File Format
 
@@ -62,6 +84,7 @@ marriages:
   - partner1: "Person 1"
     partner2: "Person 2"
     date: "YYYY-MM-DD"
+    relationship_type: "marriage"  # Optional: "couple", "partnership", etc.
 ```
 
 ### Example Configuration
@@ -85,6 +108,10 @@ marriages:
   - partner1: "Birgitte"
     partner2: "Ulrik"
     date: "2013-09-19"
+  - partner1: "Alice"
+    partner2: "Bob"
+    date: "2018-05-20"
+    relationship_type: "couple"  # Optional: custom relationship label
 ```
 
 ## Output
@@ -118,3 +145,4 @@ If the configuration file is not found, the program falls back to displaying har
 
 - [github.com/uniplaces/carbon](https://github.com/uniplaces/carbon) - Date/time helper library
 - [gopkg.in/yaml.v3](https://gopkg.in/yaml.v3) - YAML parsing library
+- [github.com/arran4/golang-ical](https://github.com/arran4/golang-ical) - iCal/ICS file generation library

@@ -4,8 +4,11 @@
 people:
   # Add people with their birthdates
   # The program will calculate:
-  # - 10,000 days birthdays
-  # - 100 months birthdays
+  # - 10,000, 20,000, and 30,000 days birthdays
+  # - 100 and 500 months birthdays
+  # - 1,000 weeks birthday
+  # - Yearly birthdays (up to 100 years)
+  # - Fibonacci days, lucky 777 days, π×1000 days
   # - Half-age milestones between people
   - name: "Me"
     birthdate: "1973-07-31"
@@ -18,8 +21,12 @@ people:
 
 events:
   # Add significant events
-  # The program will calculate powers of 2 days:
-  # 2^10 (1024), 2^11 (2048), 2^12 (4096), etc.
+  # The program will calculate:
+  # - Powers of 2 days: 2^10 (1024), 2^11 (2048), 2^12 (4096), etc.
+  # - Round year anniversaries: 5, 10, 25, 50, 75, 100 years
+  # - Yearly anniversaries (up to 100 years)
+  # - Prime number days: 1009, 2003, 3001, etc.
+  # - 1 million minutes and 100,000 hours
   - name: "Moon Landing"
     date: "1969-07-20"
   - name: "Company Founded"
@@ -30,8 +37,17 @@ events:
 marriages:
   # Add marriages
   # The program will calculate:
-  # - Year anniversaries
+  # - Year anniversaries (up to 100 years)
+  # - Bronze anniversary (12.5 years)
   # - 100 months anniversary
+  # - Days together milestones (1,000, 5,000, 10,000)
+  # - Traditional anniversary names (Paper, Wood, Silver, Golden, etc.)
+  # You can optionally specify a relationship_type (e.g., "couple", "partnership")
+  # instead of the default "marriage"
   - partner1: "Birgitte"
     partner2: "Ulrik"
     date: "2013-09-19"
+  - partner1: "Alice"
+    partner2: "Bob"
+    date: "2018-05-20"
+    relationship_type: "couple"  # Optional: custom relationship label
