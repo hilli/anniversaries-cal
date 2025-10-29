@@ -223,7 +223,7 @@ func TestExportToIcal(t *testing.T) {
 		},
 	}
 
-	tmpFile := "/tmp/test-calendar.ics"
+	tmpFile := os.TempDir() + "/test-calendar.ics"
 	err := exportToIcal(dates, tmpFile)
 	if err != nil {
 		t.Errorf("exportToIcal failed: %v", err)
