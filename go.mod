@@ -2,4 +2,7 @@ module github.com/hilli/anniversaries-cal
 
 go 1.17
 
-require github.com/uniplaces/carbon v0.1.6 // indirect
+require (
+	github.com/uniplaces/carbon v0.1.6 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
