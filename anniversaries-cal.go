@@ -76,6 +76,86 @@ func calculateInterestingDates(config Config) []InterestingDate {
 				DaysFromNow: daysFromNow,
 			})
 		}
+
+		// 1,000 weeks birthday
+		date1kWeeks := birthdate.AddDate(0, 0, 1000*7)
+		if date1kWeeks.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date1kWeeks.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's 1,000 weeks birthday", person.Name),
+				Date:        date1kWeeks,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 777 days birthday (lucky sevens)
+		date777 := birthdate.AddDate(0, 0, 777)
+		if date777.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date777.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's lucky 777 days birthday", person.Name),
+				Date:        date777,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 12,345 days birthday (sequential digits)
+		date12345 := birthdate.AddDate(0, 0, 12345)
+		if date12345.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date12345.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's 12,345 days birthday", person.Name),
+				Date:        date12345,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// Pi thousand days (3141 days, approximately pi * 1000)
+		date3141 := birthdate.AddDate(0, 0, 3141)
+		if date3141.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date3141.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's π×1000 days birthday (3,141 days)", person.Name),
+				Date:        date3141,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 500 months birthday
+		date500m := birthdate.AddDate(0, 500, 0)
+		if date500m.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date500m.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's 500 months birthday", person.Name),
+				Date:        date500m,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 20,000 days birthday
+		date20k := birthdate.AddDate(0, 0, 20000)
+		if date20k.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date20k.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's 20,000 days birthday", person.Name),
+				Date:        date20k,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// Fibonacci days (1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946)
+		fibonacciDays := []int{233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946}
+		for _, fib := range fibonacciDays {
+			dateFib := birthdate.AddDate(0, 0, fib)
+			if dateFib.After(now.AddDate(-1, 0, 0)) {
+				daysFromNow := int64(dateFib.Sub(now).Hours() / 24)
+				dates = append(dates, InterestingDate{
+					Description: fmt.Sprintf("%s's Fibonacci %d days birthday", person.Name, fib),
+					Date:        dateFib,
+					DaysFromNow: daysFromNow,
+				})
+			}
+		}
 	}
 
 	// Process events - calculate powers of 2 days
@@ -95,6 +175,56 @@ func calculateInterestingDates(config Config) []InterestingDate {
 				dates = append(dates, InterestingDate{
 					Description: fmt.Sprintf("%s: 2^%d days (%d days)", event.Name, power, days),
 					Date:        dateAtPower,
+					DaysFromNow: daysFromNow,
+				})
+			}
+		}
+
+		// Round years (5, 10, 25, 50, 75, 100 years)
+		roundYears := []int{5, 10, 25, 50, 75, 100}
+		for _, years := range roundYears {
+			dateAtYear := eventDate.AddDate(years, 0, 0)
+			if dateAtYear.After(now.AddDate(-1, 0, 0)) && dateAtYear.Before(now.AddDate(10, 0, 0)) {
+				daysFromNow := int64(dateAtYear.Sub(now).Hours() / 24)
+				dates = append(dates, InterestingDate{
+					Description: fmt.Sprintf("%s: %d year anniversary", event.Name, years),
+					Date:        dateAtYear,
+					DaysFromNow: daysFromNow,
+				})
+			}
+		}
+
+		// 1 million minutes
+		dateMillionMin := eventDate.Add(time.Minute * 1000000)
+		if dateMillionMin.After(now.AddDate(-1, 0, 0)) && dateMillionMin.Before(now.AddDate(10, 0, 0)) {
+			daysFromNow := int64(dateMillionMin.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s: 1 million minutes", event.Name),
+				Date:        dateMillionMin,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 100,000 hours
+		date100kHours := eventDate.Add(time.Hour * 100000)
+		if date100kHours.After(now.AddDate(-1, 0, 0)) && date100kHours.Before(now.AddDate(10, 0, 0)) {
+			daysFromNow := int64(date100kHours.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s: 100,000 hours", event.Name),
+				Date:        date100kHours,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// Prime number days (1009, 2003, 3001, 5003, 7001, 10007)
+		primeDays := []int{1009, 2003, 3001, 5003, 7001, 10007}
+		for _, prime := range primeDays {
+			datePrime := eventDate.AddDate(0, 0, prime)
+			if datePrime.After(now.AddDate(-1, 0, 0)) && datePrime.Before(now.AddDate(10, 0, 0)) {
+				daysFromNow := int64(datePrime.Sub(now).Hours() / 24)
+				dates = append(dates, InterestingDate{
+					Description: fmt.Sprintf("%s: %d days (prime)", event.Name, prime),
+					Date:        datePrime,
 					DaysFromNow: daysFromNow,
 				})
 			}
@@ -135,6 +265,86 @@ func calculateInterestingDates(config Config) []InterestingDate {
 				Date:        date100m,
 				DaysFromNow: daysFromNow,
 			})
+		}
+
+		// 1,000 days together
+		date1kDays := marriageDate.AddDate(0, 0, 1000)
+		if date1kDays.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date1kDays.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: 1,000 days together", marriage.Partner1, marriage.Partner2),
+				Date:        date1kDays,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 5,000 days together
+		date5kDays := marriageDate.AddDate(0, 0, 5000)
+		if date5kDays.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date5kDays.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: 5,000 days together", marriage.Partner1, marriage.Partner2),
+				Date:        date5kDays,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 10,000 days together
+		date10kDays := marriageDate.AddDate(0, 0, 10000)
+		if date10kDays.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date10kDays.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: 10,000 days together", marriage.Partner1, marriage.Partner2),
+				Date:        date10kDays,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 100 weeks together
+		date100Weeks := marriageDate.AddDate(0, 0, 100*7)
+		if date100Weeks.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date100Weeks.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: 100 weeks together", marriage.Partner1, marriage.Partner2),
+				Date:        date100Weeks,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// 500 weeks together
+		date500Weeks := marriageDate.AddDate(0, 0, 500*7)
+		if date500Weeks.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date500Weeks.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: 500 weeks together", marriage.Partner1, marriage.Partner2),
+				Date:        date500Weeks,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// Traditional anniversary names for special years
+		specialYears := map[int]string{
+			1:  "Paper",
+			5:  "Wood",
+			10: "Tin",
+			15: "Crystal",
+			20: "China",
+			25: "Silver",
+			30: "Pearl",
+			40: "Ruby",
+			50: "Golden",
+			60: "Diamond",
+		}
+		for year, name := range specialYears {
+			specialDate := marriageDate.AddDate(year, 0, 0)
+			if specialDate.After(now.AddDate(-1, 0, 0)) && specialDate.Before(now.AddDate(2, 0, 0)) {
+				daysFromNow := int64(specialDate.Sub(now).Hours() / 24)
+				dates = append(dates, InterestingDate{
+					Description: fmt.Sprintf("%s & %s: %s anniversary (%d years)", marriage.Partner1, marriage.Partner2, name, year),
+					Date:        specialDate,
+					DaysFromNow: daysFromNow,
+				})
+			}
 		}
 	}
 
@@ -251,7 +461,8 @@ func main() {
 	}
 
 	// Display interesting dates
-	fmt.Println("=== Interesting Dates Calendar ===\n")
+	fmt.Println("=== Interesting Dates Calendar ===")
+	fmt.Println()
 	for _, id := range interestingDates {
 		status := "upcoming"
 		if id.DaysFromNow < 0 {
