@@ -1,12 +1,14 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math"
 	"os"
 	"sort"
 	"time"
 
+	ics "github.com/arran4/golang-ical"
 	"github.com/uniplaces/carbon"
 	"gopkg.in/yaml.v3"
 )
@@ -22,9 +24,10 @@ type Event struct {
 }
 
 type Marriage struct {
-	Partner1 string `yaml:"partner1"`
-	Partner2 string `yaml:"partner2"`
-	Date     string `yaml:"date"`
+	Partner1         string `yaml:"partner1"`
+	Partner2         string `yaml:"partner2"`
+	Date             string `yaml:"date"`
+	RelationshipType string `yaml:"relationship_type,omitempty"` // Optional: "marriage", "couple", "partnership", etc.
 }
 
 type Config struct {
@@ -143,6 +146,30 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			})
 		}
 
+		// 30,000 days birthday
+		date30k := birthdate.AddDate(0, 0, 30000)
+		if date30k.After(now.AddDate(-1, 0, 0)) {
+			daysFromNow := int64(date30k.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s's 30,000 days birthday", person.Name),
+				Date:        date30k,
+				DaysFromNow: daysFromNow,
+			})
+		}
+
+		// Yearly birthdays up to 100 years
+		for years := 1; years <= 100; years++ {
+			birthdayDate := birthdate.AddDate(years, 0, 0)
+			if birthdayDate.After(now.AddDate(-1, 0, 0)) && birthdayDate.Before(now.AddDate(2, 0, 0)) {
+				daysFromNow := int64(birthdayDate.Sub(now).Hours() / 24)
+				dates = append(dates, InterestingDate{
+					Description: fmt.Sprintf("%s's %d year birthday", person.Name, years),
+					Date:        birthdayDate,
+					DaysFromNow: daysFromNow,
+				})
+			}
+		}
+
 		// Fibonacci days (1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946)
 		fibonacciDays := []int{233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946}
 		for _, fib := range fibonacciDays {
@@ -194,6 +221,29 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			}
 		}
 
+		// Yearly events up to 100 years
+		for years := 1; years <= 100; years++ {
+			yearDate := eventDate.AddDate(years, 0, 0)
+			if yearDate.After(now.AddDate(-1, 0, 0)) && yearDate.Before(now.AddDate(2, 0, 0)) {
+				// Skip if already covered by round years
+				isRoundYear := false
+				for _, roundYear := range roundYears {
+					if years == roundYear {
+						isRoundYear = true
+						break
+					}
+				}
+				if !isRoundYear {
+					daysFromNow := int64(yearDate.Sub(now).Hours() / 24)
+					dates = append(dates, InterestingDate{
+						Description: fmt.Sprintf("%s: %d year anniversary", event.Name, years),
+						Date:        yearDate,
+						DaysFromNow: daysFromNow,
+					})
+				}
+			}
+		}
+
 		// 1 million minutes
 		dateMillionMin := eventDate.Add(time.Minute * 1000000)
 		if dateMillionMin.After(now.AddDate(-1, 0, 0)) && dateMillionMin.Before(now.AddDate(10, 0, 0)) {
@@ -239,21 +289,34 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			continue
 		}
 
-		// Calculate anniversaries for next 50 years
-		yearsSince := now.Year() - marriageDate.Year()
-		for years := yearsSince; years <= yearsSince+10; years++ {
-			if years <= 0 {
-				continue
-			}
+		// Determine relationship type label
+		relationshipLabel := "marriage"
+		if marriage.RelationshipType != "" {
+			relationshipLabel = marriage.RelationshipType
+		}
+
+		// Calculate anniversaries for next 100 years
+		for years := 1; years <= 100; years++ {
 			anniversaryDate := marriageDate.AddDate(years, 0, 0)
 			if anniversaryDate.After(now.AddDate(-1, 0, 0)) && anniversaryDate.Before(now.AddDate(2, 0, 0)) {
 				daysFromNow := int64(anniversaryDate.Sub(now).Hours() / 24)
 				dates = append(dates, InterestingDate{
-					Description: fmt.Sprintf("%s & %s: %d year marriage anniversary", marriage.Partner1, marriage.Partner2, years),
+					Description: fmt.Sprintf("%s & %s: %d year %s anniversary", marriage.Partner1, marriage.Partner2, years, relationshipLabel),
 					Date:        anniversaryDate,
 					DaysFromNow: daysFromNow,
 				})
 			}
+		}
+
+		// Bronze anniversary (12.5 years = 4562.5 days, we'll use 4563 days)
+		bronzeDate := marriageDate.AddDate(0, 0, 4563)
+		if bronzeDate.After(now.AddDate(-1, 0, 0)) && bronzeDate.Before(now.AddDate(2, 0, 0)) {
+			daysFromNow := int64(bronzeDate.Sub(now).Hours() / 24)
+			dates = append(dates, InterestingDate{
+				Description: fmt.Sprintf("%s & %s: Bronze anniversary (12.5 years)", marriage.Partner1, marriage.Partner2),
+				Date:        bronzeDate,
+				DaysFromNow: daysFromNow,
+			})
 		}
 
 		// 100 months anniversary
@@ -413,10 +476,46 @@ func loadConfig(filename string) (*Config, error) {
 	return &config, nil
 }
 
+func exportToIcal(dates []InterestingDate, filename string) error {
+	cal := ics.NewCalendar()
+	cal.SetMethod(ics.MethodPublish)
+	cal.SetName("Interesting Dates Calendar")
+	cal.SetDescription("Anniversaries, birthdays, and special events")
+
+	for _, id := range dates {
+		event := cal.AddEvent(fmt.Sprintf("event-%d", id.Date.Unix()))
+		event.SetCreatedTime(time.Now())
+		event.SetDtStampTime(time.Now())
+		event.SetModifiedAt(time.Now())
+		event.SetStartAt(id.Date)
+		event.SetEndAt(id.Date)
+		event.SetSummary(id.Description)
+		event.SetAllDayStartAt(id.Date)
+	}
+
+	// Write to file
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return cal.SerializeTo(f)
+}
+
 func main() {
-	configFile := "anniversaries.yaml"
-	if len(os.Args) > 1 {
-		configFile = os.Args[1]
+	// Define command-line flags
+	var configFile string
+	var icalFile string
+	
+	flag.StringVar(&configFile, "config", "anniversaries.yaml", "Path to config YAML file")
+	flag.StringVar(&configFile, "c", "anniversaries.yaml", "Path to config YAML file (shorthand)")
+	flag.StringVar(&icalFile, "ical", "", "Path to export iCal file (optional)")
+	flag.Parse()
+
+	// If a positional argument is provided, use it as config file (for backwards compatibility)
+	if flag.NArg() > 0 {
+		configFile = flag.Arg(0)
 	}
 
 	config, err := loadConfig(configFile)
@@ -454,6 +553,16 @@ func main() {
 	sort.Slice(interestingDates, func(i, j int) bool {
 		return interestingDates[i].Date.Before(interestingDates[j].Date)
 	})
+
+	// Export to iCal if requested
+	if icalFile != "" {
+		err := exportToIcal(interestingDates, icalFile)
+		if err != nil {
+			fmt.Printf("Error exporting to iCal: %v\n", err)
+		} else {
+			fmt.Printf("Successfully exported to %s\n", icalFile)
+		}
+	}
 
 	// Display interesting dates
 	fmt.Println("=== Interesting Dates Calendar ===")
