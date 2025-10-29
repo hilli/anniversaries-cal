@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -91,4 +92,148 @@ func TestLoadConfig(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error loading non-existent file")
 	}
+}
+
+func TestRelationshipType(t *testing.T) {
+	config := Config{
+		Marriages: []Marriage{
+			{Partner1: "Alice", Partner2: "Bob", Date: "2020-01-01", RelationshipType: "couple"},
+			{Partner1: "Charlie", Partner2: "Diana", Date: "2020-01-01"}, // No relationship type
+		},
+	}
+
+	dates := calculateInterestingDates(config)
+
+	// Check that we have couple anniversary
+	hasCoupleAnniversary := false
+	hasMarriageAnniversary := false
+
+	for _, d := range dates {
+		if strings.Contains(d.Description, "couple anniversary") {
+			hasCoupleAnniversary = true
+		}
+		if strings.Contains(d.Description, "marriage anniversary") {
+			hasMarriageAnniversary = true
+		}
+	}
+
+	if !hasCoupleAnniversary {
+		t.Error("Expected couple anniversary")
+	}
+	if !hasMarriageAnniversary {
+		t.Error("Expected marriage anniversary")
+	}
+}
+
+func TestBronzeAnniversary(t *testing.T) {
+	// Test bronze anniversary (12.5 years = 4563 days)
+	config := Config{
+		Marriages: []Marriage{
+			{Partner1: "Alice", Partner2: "Bob", Date: "2013-06-01"},
+		},
+	}
+
+	dates := calculateInterestingDates(config)
+
+	hasBronze := false
+	for _, d := range dates {
+		if strings.Contains(d.Description, "Bronze anniversary") {
+			hasBronze = true
+			break
+		}
+	}
+
+	if !hasBronze {
+		t.Error("Expected Bronze anniversary (12.5 years)")
+	}
+}
+
+func Test30kDaysBirthday(t *testing.T) {
+	config := Config{
+		People: []Person{
+			{Name: "Test Person", Birthdate: "1945-01-01"},
+		},
+	}
+
+	dates := calculateInterestingDates(config)
+
+	has30kDays := false
+	for _, d := range dates {
+		if strings.Contains(d.Description, "30,000 days birthday") {
+			has30kDays = true
+			break
+		}
+	}
+
+	if !has30kDays {
+		t.Error("Expected 30,000 days birthday")
+	}
+}
+
+func TestYearlyBirthdays(t *testing.T) {
+	config := Config{
+		People: []Person{
+			{Name: "Test Person", Birthdate: "2000-01-01"},
+		},
+	}
+
+	dates := calculateInterestingDates(config)
+
+	hasYearlyBirthday := false
+	for _, d := range dates {
+		if strings.Contains(d.Description, "year birthday") {
+			hasYearlyBirthday = true
+			break
+		}
+	}
+
+	if !hasYearlyBirthday {
+		t.Error("Expected yearly birthdays")
+	}
+}
+
+func TestYearlyEventAnniversaries(t *testing.T) {
+	config := Config{
+		Events: []Event{
+			{Name: "Test Event", Date: "2024-01-01"},
+		},
+	}
+
+	dates := calculateInterestingDates(config)
+
+	hasYearlyAnniversary := false
+	for _, d := range dates {
+		if strings.Contains(d.Description, "year anniversary") {
+			hasYearlyAnniversary = true
+			break
+		}
+	}
+
+	if !hasYearlyAnniversary {
+		t.Error("Expected yearly event anniversaries")
+	}
+}
+
+func TestExportToIcal(t *testing.T) {
+	dates := []InterestingDate{
+		{
+			Description: "Test Event",
+			Date:        time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+			DaysFromNow: 100,
+		},
+	}
+
+	tmpFile := os.TempDir() + "/test-calendar.ics"
+	err := exportToIcal(dates, tmpFile)
+	if err != nil {
+		t.Errorf("exportToIcal failed: %v", err)
+	}
+
+	// Check that file was created
+	if _, err := os.Stat(tmpFile); err != nil {
+		t.Errorf("iCal file was not created: %v", err)
+	}
+
+	// Clean up
+	os.Remove(tmpFile)
 }
