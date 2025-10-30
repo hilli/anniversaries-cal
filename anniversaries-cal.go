@@ -9,7 +9,6 @@ import (
 	"time"
 
 	ics "github.com/arran4/golang-ical"
-	"github.com/uniplaces/carbon"
 	"gopkg.in/yaml.v3"
 )
 
@@ -521,29 +520,7 @@ func main() {
 	config, err := loadConfig(configFile)
 	if err != nil {
 		fmt.Printf("Error loading config file %s: %v\n", configFile, err)
-		fmt.Println("Using default data...")
-
-		// Fallback to hardcoded data
-		my_dates := []struct {
-			Name string
-			Date time.Time
-		}{
-			{"My birth", time.Date(1973, time.July, 31, 0, 0, 0, 0, time.UTC)},
-			{"Anniversary with my girlfriend", time.Date(2017, time.July, 4, 0, 0, 0, 0, time.UTC)},
-			{"My girlfriends birthday", time.Date(1972, time.October, 7, 0, 0, 0, 0, time.UTC)},
-			{"Anniversary of my first child", time.Date(2009, time.July, 6, 0, 0, 0, 0, time.UTC)},
-			{"Anniversary of my second child", time.Date(2013, time.April, 11, 0, 0, 0, 0, time.UTC)},
-			{"Anniversary of Birgitte & Ulriks Marriage", time.Date(2013, time.September, 19, 0, 0, 0, 0, time.UTC)},
-		}
-		now := carbon.Now()
-		for _, date := range my_dates {
-			if now.After(date.Date) {
-				fmt.Printf("%s: %d years ago\n", date.Name, now.Year()-date.Date.Year())
-			} else {
-				fmt.Printf("%s: %d years to go\n", date.Name, date.Date.Year()-now.Year())
-			}
-		}
-		return
+		os.Exit(1)
 	}
 
 	// Calculate interesting dates

@@ -137,12 +137,7 @@ Example output:
 [upcoming] 2031-06-12 - Company Founded: 100,000 hours (in 2052 days)
 ```
 
-## Fallback Mode
-
-If the configuration file is not found, the program falls back to displaying hardcoded anniversary data from the original implementation.
-
 ## Dependencies
 
-- [github.com/uniplaces/carbon](https://github.com/uniplaces/carbon) - Date/time helper library
 - [gopkg.in/yaml.v3](https://gopkg.in/yaml.v3) - YAML parsing library
 - [github.com/arran4/golang-ical](https://github.com/arran4/golang-ical) - iCal/ICS file generation library
