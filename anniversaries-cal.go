@@ -301,7 +301,7 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			if anniversaryDate.After(now.AddDate(-1, 0, 0)) && anniversaryDate.Before(now.AddDate(2, 0, 0)) {
 				daysFromNow := int64(anniversaryDate.Sub(now).Hours() / 24)
 				dates = append(dates, InterestingDate{
-					Description: fmt.Sprintf("%s & %s: %d year %s anniversary", marriage.Partner1, marriage.Partner2, years, relationshipLabel),
+					Description: fmt.Sprintf("%s & %s: %d year anniversary as a %s", marriage.Partner1, marriage.Partner2, years, relationshipLabel),
 					Date:        anniversaryDate,
 					DaysFromNow: daysFromNow,
 				})
@@ -324,7 +324,7 @@ func calculateInterestingDates(config Config) []InterestingDate {
 		if date100m.After(now.AddDate(-1, 0, 0)) {
 			daysFromNow := int64(date100m.Sub(now).Hours() / 24)
 			dates = append(dates, InterestingDate{
-				Description: fmt.Sprintf("%s & %s: 100 months marriage anniversary", marriage.Partner1, marriage.Partner2),
+				Description: fmt.Sprintf("%s & %s: 100 months as a %s anniversary", marriage.Partner1, marriage.Partner2, relationshipLabel),
 				Date:        date100m,
 				DaysFromNow: daysFromNow,
 			})
