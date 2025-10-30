@@ -426,7 +426,7 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			// Determine who is younger and who is older
 			var youngerName, olderName string
 			var youngerBirth, olderBirth time.Time
-			
+
 			if birthdate1.After(birthdate2) {
 				youngerName = person1.Name
 				olderName = person2.Name
@@ -507,7 +507,7 @@ func main() {
 	// Define command-line flags
 	var configFile string
 	var icalFile string
-	
+
 	flag.StringVar(&configFile, "config", "anniversaries.yaml", "Path to config YAML file")
 	flag.StringVar(&configFile, "c", "anniversaries.yaml", "Path to config YAML file (shorthand)")
 	flag.StringVar(&icalFile, "ical", "", "Path to export iCal file (optional)")
