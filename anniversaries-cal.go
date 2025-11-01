@@ -816,6 +816,13 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 			daysText = fmt.Sprintf("%d days ago", -date.DaysFromNow)
 		}
 		
+		// Escape all user-visible content for security
+		escapedDate := html.EscapeString(date.Date.Format("2006-01-02"))
+		escapedStatus := html.EscapeString(status)
+		escapedLongDate := html.EscapeString(date.Date.Format("January 2, 2006"))
+		escapedDescription := html.EscapeString(date.Description)
+		escapedDaysText := html.EscapeString(daysText)
+		
 		htmlBuilder.WriteString(fmt.Sprintf(`
                 <div class="timeline-item %s" data-date="%s" data-days="%d">
                     <div class="event-card">
@@ -826,8 +833,8 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                         <button class="pin-button" onclick="togglePin(this)">📌 Pin</button>
                     </div>
                 </div>
-`, itemClass, html.EscapeString(date.Date.Format("2006-01-02")), date.DaysFromNow, statusClass, html.EscapeString(status), 
-			html.EscapeString(date.Date.Format("January 2, 2006")), html.EscapeString(date.Description), html.EscapeString(daysText)))
+`, itemClass, escapedDate, date.DaysFromNow, statusClass, escapedStatus,
+			escapedLongDate, escapedDescription, escapedDaysText))
 	}
 
 	// Write closing HTML and JavaScript
