@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"html"
 	"math"
 	"os"
 	"sort"
@@ -504,10 +505,10 @@ func exportToIcal(dates []InterestingDate, filename string) error {
 }
 
 func exportToHTML(dates []InterestingDate, filename string) error {
-	var html strings.Builder
+	var htmlBuilder strings.Builder
 	
 	// Write HTML header and CSS
-	html.WriteString(`<!DOCTYPE html>
+	htmlBuilder.WriteString(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -815,7 +816,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 			daysText = fmt.Sprintf("%d days ago", -date.DaysFromNow)
 		}
 		
-		html.WriteString(fmt.Sprintf(`
+		htmlBuilder.WriteString(fmt.Sprintf(`
                 <div class="timeline-item %s" data-date="%s" data-days="%d">
                     <div class="event-card">
                         <span class="status-badge %s">%s</span>
@@ -825,12 +826,12 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                         <button class="pin-button" onclick="togglePin(this)">📌 Pin</button>
                     </div>
                 </div>
-`, itemClass, date.Date.Format("2006-01-02"), date.DaysFromNow, statusClass, status, 
-			date.Date.Format("January 2, 2006"), date.Description, daysText))
+`, itemClass, html.EscapeString(date.Date.Format("2006-01-02")), date.DaysFromNow, statusClass, html.EscapeString(status), 
+			html.EscapeString(date.Date.Format("January 2, 2006")), html.EscapeString(date.Description), html.EscapeString(daysText)))
 	}
 
 	// Write closing HTML and JavaScript
-	html.WriteString(`
+	htmlBuilder.WriteString(`
             </div>
         </div>
     </div>
@@ -965,7 +966,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 </html>`)
 
 	// Write to file
-	return os.WriteFile(filename, []byte(html.String()), 0644)
+	return os.WriteFile(filename, []byte(htmlBuilder.String()), 0644)
 }
 
 func main() {

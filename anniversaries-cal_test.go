@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -223,7 +224,7 @@ func TestExportToIcal(t *testing.T) {
 		},
 	}
 
-	tmpFile := os.TempDir() + "/test-calendar.ics"
+	tmpFile := filepath.Join(os.TempDir(), "test-calendar.ics")
 	err := exportToIcal(dates, tmpFile)
 	if err != nil {
 		t.Errorf("exportToIcal failed: %v", err)
@@ -252,7 +253,7 @@ func TestExportToHTML(t *testing.T) {
 		},
 	}
 
-	tmpFile := os.TempDir() + "/test-timeline.html"
+	tmpFile := filepath.Join(os.TempDir(), "test-timeline.html")
 	err := exportToHTML(dates, tmpFile)
 	if err != nil {
 		t.Errorf("exportToHTML failed: %v", err)
