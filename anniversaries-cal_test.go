@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -223,7 +224,7 @@ func TestExportToIcal(t *testing.T) {
 		},
 	}
 
-	tmpFile := os.TempDir() + "/test-calendar.ics"
+	tmpFile := filepath.Join(os.TempDir(), "test-calendar.ics")
 	err := exportToIcal(dates, tmpFile)
 	if err != nil {
 		t.Errorf("exportToIcal failed: %v", err)
@@ -232,6 +233,63 @@ func TestExportToIcal(t *testing.T) {
 	// Check that file was created
 	if _, err := os.Stat(tmpFile); err != nil {
 		t.Errorf("iCal file was not created: %v", err)
+	}
+
+	// Clean up
+	os.Remove(tmpFile)
+}
+
+func TestExportToHTML(t *testing.T) {
+	dates := []InterestingDate{
+		{
+			Description: "Test Event 1",
+			Date:        time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+			DaysFromNow: 100,
+		},
+		{
+			Description: "Test Event 2",
+			Date:        time.Date(2025, 6, 15, 0, 0, 0, 0, time.UTC),
+			DaysFromNow: -50,
+		},
+	}
+
+	tmpFile := filepath.Join(os.TempDir(), "test-timeline.html")
+	err := exportToHTML(dates, tmpFile)
+	if err != nil {
+		t.Errorf("exportToHTML failed: %v", err)
+	}
+
+	// Check that file was created
+	if _, err := os.Stat(tmpFile); err != nil {
+		t.Errorf("HTML file was not created: %v", err)
+	}
+
+	// Read file and check for expected content
+	content, err := os.ReadFile(tmpFile)
+	if err != nil {
+		t.Errorf("Failed to read HTML file: %v", err)
+	}
+
+	htmlContent := string(content)
+
+	// Check for essential HTML elements
+	if !strings.Contains(htmlContent, "<!DOCTYPE html>") {
+		t.Error("HTML file missing DOCTYPE declaration")
+	}
+	if !strings.Contains(htmlContent, "Anniversaries Timeline") {
+		t.Error("HTML file missing title")
+	}
+	if !strings.Contains(htmlContent, "Test Event 1") {
+		t.Error("HTML file missing first event")
+	}
+	if !strings.Contains(htmlContent, "Test Event 2") {
+		t.Error("HTML file missing second event")
+	}
+	if !strings.Contains(htmlContent, "timeline-item") {
+		t.Error("HTML file missing timeline-item class")
+	}
+	if !strings.Contains(htmlContent, "togglePin") {
+		t.Error("HTML file missing pin functionality")
 	}
 
 	// Clean up

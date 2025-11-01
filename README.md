@@ -58,14 +58,18 @@ go build
 # Export to iCal format
 ./anniversaries-cal --ical anniversaries.ics
 
-# Combine config and iCal export
-./anniversaries-cal -c my-dates.yaml --ical my-calendar.ics
+# Export to HTML timeline format
+./anniversaries-cal --html timeline.html
+
+# Combine config and exports
+./anniversaries-cal -c my-dates.yaml --ical my-calendar.ics --html my-timeline.html
 ```
 
 ### Command-Line Options
 
 - `-c, --config <file>`: Specify the path to a YAML configuration file (default: `anniversaries.yaml`)
 - `--ical <file>`: Export all interesting dates to an iCal file for use with calendar applications (optional)
+- `--html <file>`: Export all interesting dates to an interactive HTML timeline (optional)
 
 ## Configuration File Format
 
@@ -136,6 +140,23 @@ Example output:
 [upcoming] 2028-05-03 - Me's 20,000 days birthday (in 916 days)
 [upcoming] 2031-06-12 - Company Founded: 100,000 hours (in 2052 days)
 ```
+
+### HTML Timeline Export
+
+The `--html` flag generates an interactive HTML timeline with the following features:
+
+- **Beautiful visual design**: A sleek, gradient-themed interface with smooth animations
+- **Scrollable timeline**: Events are displayed chronologically with past events at the top and future events below
+- **Pin functionality**: Click the pin button on any event to pin it to the top of the page
+- **Relative time indicators**: When you scroll through the timeline, pinned events show their relative distance (in days, months, or years) from the currently visible events
+- **Persistent pins**: Pinned events are saved in browser local storage and persist across page reloads
+- **Responsive design**: Works on desktop and mobile devices
+- **Self-contained**: All CSS and JavaScript are embedded in the HTML file - no external dependencies required
+
+The timeline automatically scrolls to "today" on page load, making it easy to see upcoming events. Past events are shown with reduced opacity to help focus on what's coming next.
+
+![Timeline Example](https://github.com/user-attachments/assets/4f2c06b5-efd4-47e1-a9f9-1cbd914b5aaf)
+![Pinned Events with Relative Time](https://github.com/user-attachments/assets/aae6e9b0-94f4-450e-94e0-ac63f5ce283c)
 
 ## Dependencies
 
