@@ -890,7 +890,9 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             
             // Display pinned events with relative time
             pinnedEvents.forEach(date => {
-                const item = document.querySelector('.timeline-item[data-date="' + date + '"]');
+                // Use Array.from to safely search for elements by data attribute
+                const items = Array.from(document.querySelectorAll('.timeline-item'));
+                const item = items.find(el => el.dataset.date === date);
                 if (!item) return;
                 
                 const description = item.querySelector('.event-description').textContent;
@@ -918,7 +920,14 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 
                 const pinnedDiv = document.createElement('div');
                 pinnedDiv.className = 'pinned-event';
-                pinnedDiv.innerHTML = '<span>' + description + '</span><span class="relative-time">' + relativeText + '</span>';
+                // Use textContent for safer DOM manipulation
+                const descSpan = document.createElement('span');
+                descSpan.textContent = description;
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'relative-time';
+                timeSpan.textContent = relativeText;
+                pinnedDiv.appendChild(descSpan);
+                pinnedDiv.appendChild(timeSpan);
                 pinnedList.appendChild(pinnedDiv);
             });
         }
@@ -932,7 +941,9 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             if (saved) {
                 const dates = JSON.parse(saved);
                 dates.forEach(date => {
-                    const item = document.querySelector('.timeline-item[data-date="' + date + '"]');
+                    // Use Array.from to safely search for elements by data attribute
+                    const items = Array.from(document.querySelectorAll('.timeline-item'));
+                    const item = items.find(el => el.dataset.date === date);
                     if (item) {
                         pinnedEvents.add(date);
                         item.classList.add('pinned');

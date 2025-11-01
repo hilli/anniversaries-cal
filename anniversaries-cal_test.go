@@ -271,7 +271,7 @@ func TestExportToHTML(t *testing.T) {
 	}
 
 	htmlContent := string(content)
-	
+
 	// Check for essential HTML elements
 	if !strings.Contains(htmlContent, "<!DOCTYPE html>") {
 		t.Error("HTML file missing DOCTYPE declaration")
