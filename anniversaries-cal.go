@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	ics "github.com/arran4/golang-ical"
@@ -502,14 +503,481 @@ func exportToIcal(dates []InterestingDate, filename string) error {
 	return cal.SerializeTo(f)
 }
 
+func exportToHTML(dates []InterestingDate, filename string) error {
+	var html strings.Builder
+	
+	// Write HTML header and CSS
+	html.WriteString(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anniversaries Timeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pinned-events {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .pinned-events.visible {
+            display: block;
+        }
+        
+        .pinned-events h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .pinned-event {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .pinned-event .relative-time {
+            font-size: 0.9em;
+            opacity: 0.95;
+        }
+        
+        .timeline-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .timeline-item:hover::before {
+            transform: scale(1.3);
+            box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .timeline-item.pinned::before {
+            background: #ffd89b;
+            border-color: #19547b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(255, 216, 155, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 216, 155, 0.1);
+            }
+        }
+        
+        .timeline-item.today::before {
+            background: #ff6b6b;
+            border-color: #ee5a52;
+            animation: todayPulse 1.5s infinite;
+        }
+        
+        @keyframes todayPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0.1);
+            }
+        }
+        
+        .timeline-item.past {
+            opacity: 0.7;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .timeline-item:hover .event-card {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .event-date {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .event-description {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .event-relative {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .status-past {
+            background: #e8eaf6;
+            color: #5c6bc0;
+        }
+        
+        .status-today {
+            background: #ffebee;
+            color: #e53935;
+            animation: todayBadgePulse 2s infinite;
+        }
+        
+        @keyframes todayBadgePulse {
+            0%, 100% {
+                background: #ffebee;
+            }
+            50% {
+                background: #ffcdd2;
+            }
+        }
+        
+        .status-upcoming {
+            background: #e8f5e9;
+            color: #43a047;
+        }
+        
+        .pin-button {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        
+        .pin-button:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .pin-button.pinned {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            border-color: #19547b;
+            color: white;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Anniversaries Timeline ✨</h1>
+        
+        <div class="pinned-events" id="pinnedEvents">
+            <h2>📌 Pinned Events</h2>
+            <div id="pinnedList"></div>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline" id="timeline">
+`)
+
+	// Add timeline items
+	for _, date := range dates {
+		status := "upcoming"
+		statusClass := "status-upcoming"
+		itemClass := ""
+		
+		if date.DaysFromNow < 0 {
+			status = "past"
+			statusClass = "status-past"
+			itemClass = "past"
+		} else if date.DaysFromNow == 0 {
+			status = "TODAY"
+			statusClass = "status-today"
+			itemClass = "today"
+		}
+		
+		daysText := fmt.Sprintf("%d days", date.DaysFromNow)
+		if date.DaysFromNow == 0 {
+			daysText = "Today!"
+		} else if date.DaysFromNow == 1 {
+			daysText = "Tomorrow"
+		} else if date.DaysFromNow == -1 {
+			daysText = "Yesterday"
+		} else if date.DaysFromNow > 0 {
+			daysText = fmt.Sprintf("in %d days", date.DaysFromNow)
+		} else {
+			daysText = fmt.Sprintf("%d days ago", -date.DaysFromNow)
+		}
+		
+		html.WriteString(fmt.Sprintf(`
+                <div class="timeline-item %s" data-date="%s" data-days="%d">
+                    <div class="event-card">
+                        <span class="status-badge %s">%s</span>
+                        <div class="event-date">%s</div>
+                        <div class="event-description">%s</div>
+                        <div class="event-relative">%s</div>
+                        <button class="pin-button" onclick="togglePin(this)">📌 Pin</button>
+                    </div>
+                </div>
+`, itemClass, date.Date.Format("2006-01-02"), date.DaysFromNow, statusClass, status, 
+			date.Date.Format("January 2, 2006"), date.Description, daysText))
+	}
+
+	// Write closing HTML and JavaScript
+	html.WriteString(`
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const pinnedEvents = new Set();
+        
+        function togglePin(button) {
+            const item = button.closest('.timeline-item');
+            const date = item.dataset.date;
+            const description = item.querySelector('.event-description').textContent;
+            const days = parseInt(item.dataset.days);
+            
+            if (pinnedEvents.has(date)) {
+                pinnedEvents.delete(date);
+                item.classList.remove('pinned');
+                button.classList.remove('pinned');
+                button.textContent = '📌 Pin';
+            } else {
+                pinnedEvents.add(date);
+                item.classList.add('pinned');
+                button.classList.add('pinned');
+                button.textContent = '✓ Pinned';
+            }
+            
+            updatePinnedDisplay();
+            savePinnedToStorage();
+        }
+        
+        function updatePinnedDisplay() {
+            const pinnedList = document.getElementById('pinnedList');
+            const pinnedEventsContainer = document.getElementById('pinnedEvents');
+            
+            if (pinnedEvents.size === 0) {
+                pinnedEventsContainer.classList.remove('visible');
+                return;
+            }
+            
+            pinnedEventsContainer.classList.add('visible');
+            pinnedList.innerHTML = '';
+            
+            // Get currently visible items in viewport
+            const timeline = document.querySelector('.timeline-container');
+            const timelineRect = timeline.getBoundingClientRect();
+            const items = document.querySelectorAll('.timeline-item');
+            
+            let visibleDays = null;
+            items.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                if (rect.top >= timelineRect.top && rect.top <= timelineRect.bottom) {
+                    if (visibleDays === null) {
+                        visibleDays = parseInt(item.dataset.days);
+                    }
+                }
+            });
+            
+            // Display pinned events with relative time
+            pinnedEvents.forEach(date => {
+                const item = document.querySelector('.timeline-item[data-date="' + date + '"]');
+                if (!item) return;
+                
+                const description = item.querySelector('.event-description').textContent;
+                const days = parseInt(item.dataset.days);
+                
+                let relativeText = '';
+                if (visibleDays !== null && days !== visibleDays) {
+                    const diff = days - visibleDays;
+                    const absDiff = Math.abs(diff);
+                    
+                    if (absDiff === 0) {
+                        relativeText = 'Same day';
+                    } else if (absDiff === 1) {
+                        relativeText = diff > 0 ? '+1 day' : '-1 day';
+                    } else if (absDiff < 30) {
+                        relativeText = diff > 0 ? '+' + absDiff + ' days' : '-' + absDiff + ' days';
+                    } else if (absDiff < 365) {
+                        const months = Math.round(absDiff / 30);
+                        relativeText = diff > 0 ? '+' + months + ' month' + (months > 1 ? 's' : '') : '-' + months + ' month' + (months > 1 ? 's' : '');
+                    } else {
+                        const years = Math.round(absDiff / 365);
+                        relativeText = diff > 0 ? '+' + years + ' year' + (years > 1 ? 's' : '') : '-' + years + ' year' + (years > 1 ? 's' : '');
+                    }
+                }
+                
+                const pinnedDiv = document.createElement('div');
+                pinnedDiv.className = 'pinned-event';
+                pinnedDiv.innerHTML = '<span>' + description + '</span><span class="relative-time">' + relativeText + '</span>';
+                pinnedList.appendChild(pinnedDiv);
+            });
+        }
+        
+        function savePinnedToStorage() {
+            localStorage.setItem('pinnedEvents', JSON.stringify([...pinnedEvents]));
+        }
+        
+        function loadPinnedFromStorage() {
+            const saved = localStorage.getItem('pinnedEvents');
+            if (saved) {
+                const dates = JSON.parse(saved);
+                dates.forEach(date => {
+                    const item = document.querySelector('.timeline-item[data-date="' + date + '"]');
+                    if (item) {
+                        pinnedEvents.add(date);
+                        item.classList.add('pinned');
+                        const button = item.querySelector('.pin-button');
+                        button.classList.add('pinned');
+                        button.textContent = '✓ Pinned';
+                    }
+                });
+                updatePinnedDisplay();
+            }
+        }
+        
+        // Update pinned display on scroll
+        document.querySelector('.timeline-container').addEventListener('scroll', () => {
+            if (pinnedEvents.size > 0) {
+                updatePinnedDisplay();
+            }
+        });
+        
+        // Scroll to today on load
+        window.addEventListener('load', () => {
+            loadPinnedFromStorage();
+            
+            const todayItem = document.querySelector('.timeline-item.today');
+            if (todayItem) {
+                todayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body>
+</html>`)
+
+	// Write to file
+	return os.WriteFile(filename, []byte(html.String()), 0644)
+}
+
 func main() {
 	// Define command-line flags
 	var configFile string
 	var icalFile string
+	var htmlFile string
 
 	flag.StringVar(&configFile, "config", "anniversaries.yaml", "Path to config YAML file")
 	flag.StringVar(&configFile, "c", "anniversaries.yaml", "Path to config YAML file (shorthand)")
 	flag.StringVar(&icalFile, "ical", "", "Path to export iCal file (optional)")
+	flag.StringVar(&htmlFile, "html", "", "Path to export HTML timeline file (optional)")
 	flag.Parse()
 
 	// If a positional argument is provided, use it as config file (for backwards compatibility)
@@ -538,6 +1006,16 @@ func main() {
 			fmt.Printf("Error exporting to iCal: %v\n", err)
 		} else {
 			fmt.Printf("Successfully exported to %s\n", icalFile)
+		}
+	}
+
+	// Export to HTML if requested
+	if htmlFile != "" {
+		err := exportToHTML(interestingDates, htmlFile)
+		if err != nil {
+			fmt.Printf("Error exporting to HTML: %v\n", err)
+		} else {
+			fmt.Printf("Successfully exported to %s\n", htmlFile)
 		}
 	}
 
