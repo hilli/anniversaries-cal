@@ -73,6 +73,13 @@ go build
 
 ## Configuration File Format
 
+The program looks for configuration files in the following locations (in order):
+
+1. **Current directory**: `anniversaries.yaml` (or the file specified with `-c`/`--config`)
+2. **User config directory**: `~/.config/anniversaries-cal/anniversaries.yaml` (Unix/Linux), `~/Library/Application Support/anniversaries-cal/anniversaries.yaml` (macOS) or `%APPDATA%\anniversaries-cal\anniversaries.yaml` (Windows)
+
+The program will automatically try the user config directory if the default `anniversaries.yaml` file is not found in the current directory. This allows you to keep a global configuration file that works from any directory.
+
 Create a YAML file with the following structure:
 
 ```yaml

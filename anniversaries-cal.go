@@ -6,6 +6,7 @@ import (
 	"html"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -463,18 +464,38 @@ func calculateInterestingDates(config Config) []InterestingDate {
 }
 
 func loadConfig(filename string) (*Config, error) {
+	// Try the provided filename first
 	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		// File found, parse it
+		var config Config
+		err = yaml.Unmarshal(data, &config)
+		if err != nil {
+			return nil, err
+		}
+		return &config, nil
 	}
 
-	var config Config
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		return nil, err
+	// If file not found and it's the default filename, try user config directory
+	if filename == "anniversaries.yaml" {
+		userConfigDir, err := os.UserConfigDir()
+		if err == nil {
+			configPath := filepath.Join(userConfigDir, "anniversaries-cal", "anniversaries.yaml")
+			fmt.Println(configPath)
+			data, err := os.ReadFile(configPath)
+			if err == nil {
+				var config Config
+				err = yaml.Unmarshal(data, &config)
+				if err != nil {
+					return nil, err
+				}
+				return &config, nil
+			}
+		}
 	}
 
-	return &config, nil
+	// Return the original error if no config file was found
+	return nil, err
 }
 
 func exportToIcal(dates []InterestingDate, filename string) error {
@@ -506,7 +527,7 @@ func exportToIcal(dates []InterestingDate, filename string) error {
 
 func exportToHTML(dates []InterestingDate, filename string) error {
 	var htmlBuilder strings.Builder
-	
+
 	// Write HTML header and CSS
 	htmlBuilder.WriteString(`<!DOCTYPE html>
 <html lang="en">
@@ -792,7 +813,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 		status := "upcoming"
 		statusClass := "status-upcoming"
 		itemClass := ""
-		
+
 		if date.DaysFromNow < 0 {
 			status = "past"
 			statusClass = "status-past"
@@ -802,7 +823,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 			statusClass = "status-today"
 			itemClass = "today"
 		}
-		
+
 		daysText := fmt.Sprintf("%d days", date.DaysFromNow)
 		if date.DaysFromNow == 0 {
 			daysText = "Today!"
@@ -815,14 +836,14 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 		} else {
 			daysText = fmt.Sprintf("%d days ago", -date.DaysFromNow)
 		}
-		
+
 		// Escape all user-visible content for security
 		escapedDate := html.EscapeString(date.Date.Format("2006-01-02"))
 		escapedStatus := html.EscapeString(status)
 		escapedLongDate := html.EscapeString(date.Date.Format("January 2, 2006"))
 		escapedDescription := html.EscapeString(date.Description)
 		escapedDaysText := html.EscapeString(daysText)
-		
+
 		htmlBuilder.WriteString(fmt.Sprintf(`
                 <div class="timeline-item %s" data-date="%s" data-days="%d">
                     <div class="event-card">
