@@ -1021,9 +1021,16 @@ func exportToHTML(dates []InterestingDate, filename string) error {
         window.addEventListener('load', () => {
             loadPinnedFromStorage();
 
+            // Scroll to today's item, or the first upcoming event if nothing is today
             const todayItem = document.querySelector('.timeline-item.today');
             if (todayItem) {
                 todayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                const items = Array.from(document.querySelectorAll('.timeline-item'));
+                const firstUpcoming = items.find(el => parseInt(el.dataset.days) >= 0);
+                if (firstUpcoming) {
+                    firstUpcoming.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
     </script>
