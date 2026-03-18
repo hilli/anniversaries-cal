@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  BINARY: anniversaries-cal
+  CONFIG: anniversaries.hilli.yaml
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list-all
+
+  build:
+    desc: Build the binary
+    sources:
+      - "*.go"
+      - go.mod
+      - go.sum
+    generates:
+      - "{{.BINARY}}"
+    cmds:
+      - go build -o {{.BINARY}} .
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v ./...
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  run:
+    desc: Build and run with default config
+    deps: [build]
+    cmds:
+      - ./{{.BINARY}} -c {{.CONFIG}}
+
+  run:html:
+    desc: Build and generate HTML + iCal output
+    deps: [build]
+    cmds:
+      - ./{{.BINARY}} -c {{.CONFIG}} -html cal.html -ical cal.ical
+
+  check:
+    desc: Lint and test
+    cmds:
+      - task: lint
+      - task: test
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - rm -f {{.BINARY}}
+      - rm -f cal.html cal.ical
+
+  release:snapshot:
+    desc: Create a snapshot release with goreleaser
+    cmds:
+      - goreleaser release --snapshot --clean
+
+  tidy:
+    desc: Tidy Go modules
+    cmds:
+      - go mod tidy
