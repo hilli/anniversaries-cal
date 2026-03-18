@@ -1017,20 +1017,26 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             }
         });
 
-        // Scroll to today on load
+        // Scroll to current date on load, computed from the viewer's clock
         window.addEventListener('load', () => {
             loadPinnedFromStorage();
 
-            // Scroll to today's item, or the first upcoming event if nothing is today
-            const todayItem = document.querySelector('.timeline-item.today');
-            if (todayItem) {
-                todayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                const items = Array.from(document.querySelectorAll('.timeline-item'));
-                const firstUpcoming = items.find(el => parseInt(el.dataset.days) >= 0);
-                if (firstUpcoming) {
-                    firstUpcoming.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const items = Array.from(document.querySelectorAll('.timeline-item'));
+
+            // Find the closest item to today (exact match or first future event)
+            let target = null;
+            for (const item of items) {
+                const itemDate = new Date(item.dataset.date + 'T00:00:00');
+                if (itemDate >= today) {
+                    target = item;
+                    break;
                 }
+                target = item; // keep last past item as fallback
+            }
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     </script>
