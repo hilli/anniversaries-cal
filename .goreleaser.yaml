@@ -54,19 +54,22 @@ archives:
       - LICENSE
       - anniversaries.example.yaml
 
-brews:
+homebrew_casks:
   - name: anniversaries-cal
-    goarm: 7
     commit_author:
       name: Jens Hilligsøe
       email: github@hilli.dk
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
     homepage: "https://github.com/hilli/anniversaries-cal"
     description: "Generate interesting date calculations from birthdates, events, and marriages"
-    license: "MIT"
-    url_template: "https://github.com/hilli/anniversaries-cal/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    skip_upload: false
-    directory: Formula
+    url:
+      verified: github.com/hilli/anniversaries-cal
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/anniversaries-cal"]
+          end
     repository:
       owner: hilli
       name: homebrew-tap
