@@ -595,6 +595,23 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             font-weight: 500;
         }
 
+        .pinned-event .unpin-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            padding: 2px 8px;
+            margin-left: 10px;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .pinned-event .unpin-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
         .pinned-event .relative-time {
             font-size: 0.9em;
             opacity: 0.95;
@@ -950,20 +967,43 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 
                 const pinnedDiv = document.createElement('div');
                 pinnedDiv.className = 'pinned-event';
-                // Use textContent for safer DOM manipulation
                 const descSpan = document.createElement('span');
                 descSpan.textContent = description;
+                const rightSpan = document.createElement('span');
+                rightSpan.style.display = 'flex';
+                rightSpan.style.alignItems = 'center';
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'relative-time';
                 timeSpan.textContent = relativeText;
+                const unpinBtn = document.createElement('button');
+                unpinBtn.className = 'unpin-button';
+                unpinBtn.textContent = '✕';
+                unpinBtn.title = 'Unpin';
+                unpinBtn.addEventListener('click', () => unpinEvent(date));
+                rightSpan.appendChild(timeSpan);
+                rightSpan.appendChild(unpinBtn);
                 pinnedDiv.appendChild(descSpan);
-                pinnedDiv.appendChild(timeSpan);
+                pinnedDiv.appendChild(rightSpan);
                 pinnedList.appendChild(pinnedDiv);
             });
         }
 
         function savePinnedToStorage() {
             localStorage.setItem('pinnedEvents', JSON.stringify([...pinnedEvents]));
+        }
+
+        function unpinEvent(date) {
+            pinnedEvents.delete(date);
+            const items = Array.from(document.querySelectorAll('.timeline-item'));
+            const item = items.find(el => el.dataset.date === date);
+            if (item) {
+                item.classList.remove('pinned');
+                const button = item.querySelector('.pin-button');
+                button.classList.remove('pinned');
+                button.textContent = '📌 Pin';
+            }
+            updatePinnedDisplay();
+            savePinnedToStorage();
         }
 
         function loadPinnedFromStorage() {
