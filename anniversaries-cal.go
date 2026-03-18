@@ -920,49 +920,33 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             pinnedEventsContainer.classList.add('visible');
             pinnedList.innerHTML = '';
 
-            // Get currently visible items in viewport
-            const timeline = document.querySelector('.timeline-container');
-            const timelineRect = timeline.getBoundingClientRect();
-            const items = document.querySelectorAll('.timeline-item');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-            let visibleDays = null;
-            items.forEach(item => {
-                const rect = item.getBoundingClientRect();
-                if (rect.top >= timelineRect.top && rect.top <= timelineRect.bottom) {
-                    if (visibleDays === null) {
-                        visibleDays = parseInt(item.dataset.days);
-                    }
-                }
-            });
-
-            // Display pinned events with relative time
+            // Display pinned events with relative time from today
             pinnedEvents.forEach(date => {
-                // Use Array.from to safely search for elements by data attribute
                 const items = Array.from(document.querySelectorAll('.timeline-item'));
                 const item = items.find(el => el.dataset.date === date);
                 if (!item) return;
 
                 const description = item.querySelector('.event-description').textContent;
-                const days = parseInt(item.dataset.days);
+                const eventDate = new Date(date + 'T00:00:00');
+                const diff = Math.round((eventDate - today) / (1000 * 60 * 60 * 24));
+                const absDiff = Math.abs(diff);
 
                 let relativeText = '';
-                if (visibleDays !== null && days !== visibleDays) {
-                    const diff = days - visibleDays;
-                    const absDiff = Math.abs(diff);
-
-                    if (absDiff === 0) {
-                        relativeText = 'Same day';
-                    } else if (absDiff === 1) {
-                        relativeText = diff > 0 ? '+1 day' : '-1 day';
-                    } else if (absDiff < 30) {
-                        relativeText = diff > 0 ? '+' + absDiff + ' days' : '-' + absDiff + ' days';
-                    } else if (absDiff < 365) {
-                        const months = Math.round(absDiff / 30);
-                        relativeText = diff > 0 ? '+' + months + ' month' + (months > 1 ? 's' : '') : '-' + months + ' month' + (months > 1 ? 's' : '');
-                    } else {
-                        const years = Math.round(absDiff / 365);
-                        relativeText = diff > 0 ? '+' + years + ' year' + (years > 1 ? 's' : '') : '-' + years + ' year' + (years > 1 ? 's' : '');
-                    }
+                if (diff === 0) {
+                    relativeText = 'Today';
+                } else if (absDiff === 1) {
+                    relativeText = diff > 0 ? 'Tomorrow' : 'Yesterday';
+                } else if (absDiff < 30) {
+                    relativeText = diff > 0 ? 'in ' + absDiff + ' days' : absDiff + ' days ago';
+                } else if (absDiff < 365) {
+                    const months = Math.round(absDiff / 30);
+                    relativeText = diff > 0 ? 'in ' + months + ' month' + (months > 1 ? 's' : '') : months + ' month' + (months > 1 ? 's' : '') + ' ago';
+                } else {
+                    const years = Math.round(absDiff / 365);
+                    relativeText = diff > 0 ? 'in ' + years + ' year' + (years > 1 ? 's' : '') : years + ' year' + (years > 1 ? 's' : '') + ' ago';
                 }
 
                 const pinnedDiv = document.createElement('div');
