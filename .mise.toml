@@ -39,7 +39,7 @@ depends = ["lint", "test"]
 
 [tasks.clean]
 description = "Remove build artifacts"
-run = "rm -f $BINARY cal.html cal.ical"
+run = "rm -f $BINARY cal.html cal.ics"
 
 [tasks."release:snapshot"]
 description = "Create a snapshot release with goreleaser"
