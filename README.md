@@ -37,12 +37,32 @@ The program calculates and displays various "interesting dates" including:
 - **Days together milestones** - 1,000, 5,000, and 10,000 days together
 - **Weeks together milestones** - 100 and 500 weeks together
 
+## Getting Started
+
+This project uses [mise](https://mise.jdx.dev/) to manage tool versions and tasks. With mise installed, run:
+
+```bash
+mise install   # Install Go, golangci-lint, and goreleaser
+mise run build # Build the binary
+```
+
+### Available Tasks
+
+| Task | Description |
+|---|---|
+| `mise run build` | Build the binary |
+| `mise run test` | Run tests |
+| `mise run lint` | Run golangci-lint |
+| `mise run check` | Lint and test |
+| `mise run run` | Build and run with default config |
+| `mise run run:html` | Build and generate HTML + iCal output |
+| `mise run clean` | Remove build artifacts |
+| `mise run tidy` | Tidy Go modules |
+| `mise run release:snapshot` | Create a snapshot release with goreleaser |
+
 ## Usage
 
 ```bash
-# Build the program
-go build
-
 # Run with default config file (anniversaries.yaml)
 ./anniversaries-cal
 
