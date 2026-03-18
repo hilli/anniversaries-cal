@@ -127,7 +127,7 @@ func TestRelationshipType(t *testing.T) {
 }
 
 func TestBronzeAnniversary(t *testing.T) {
-	// Test bronze anniversary (12.5 years = 4563 days)
+	// Test bronze anniversary (12.5 years = 12 years and 6 months)
 	config := Config{
 		Marriages: []Marriage{
 			{Partner1: "Alice", Partner2: "Bob", Date: "2013-06-01"},

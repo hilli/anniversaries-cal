@@ -50,7 +50,9 @@ func parseDate(dateStr string) (time.Time, error) {
 
 func calculateInterestingDates(config Config) []InterestingDate {
 	var dates []InterestingDate
-	now := time.Now()
+	// Truncate to midnight UTC to match dates from parseDate, ensuring
+	// daysFromNow calculations produce exact calendar-day differences.
+	now := time.Now().UTC().Truncate(24 * time.Hour)
 
 	// Process people - calculate interesting birthdays
 	for _, person := range config.People {
@@ -310,8 +312,8 @@ func calculateInterestingDates(config Config) []InterestingDate {
 			}
 		}
 
-		// Bronze anniversary (12.5 years = 4562.5 days, we'll use 4563 days)
-		bronzeDate := marriageDate.AddDate(0, 0, 4563)
+		// Bronze anniversary (12.5 years = 12 years and 6 months)
+		bronzeDate := marriageDate.AddDate(12, 6, 0)
 		if bronzeDate.After(now.AddDate(-1, 0, 0)) && bronzeDate.Before(now.AddDate(2, 0, 0)) {
 			daysFromNow := int64(bronzeDate.Sub(now).Hours() / 24)
 			dates = append(dates, InterestingDate{

@@ -30,7 +30,7 @@ The program calculates and displays various "interesting dates" including:
 
 ### For Marriages
 - **Year anniversaries** - Tracks marriage/relationship anniversaries up to 100 years
-- **Bronze anniversary** - 12.5 years (4,563 days) together
+- **Bronze anniversary** - 12.5 years (12 years and 6 months) together
 - **Traditional anniversary names** - Paper (1st), Wood (5th), Tin (10th), Crystal (15th), China (20th), Silver (25th), Pearl (30th), Ruby (40th), Golden (50th), Diamond (60th)
 - **Custom relationship types** - Optional ability to label relationships (e.g., "couple", "partnership" instead of "marriage")
 - **100 months anniversary** - When a couple reaches 100 months together
