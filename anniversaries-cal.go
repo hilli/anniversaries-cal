@@ -543,19 +543,19 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         h1 {
             color: white;
             text-align: center;
@@ -563,7 +563,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         .pinned-events {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
@@ -572,17 +572,17 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             display: none;
         }
-        
+
         .pinned-events.visible {
             display: block;
         }
-        
+
         .pinned-events h2 {
             color: #764ba2;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
-        
+
         .pinned-event {
             background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
             color: white;
@@ -594,12 +594,12 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             align-items: center;
             font-weight: 500;
         }
-        
+
         .pinned-event .relative-time {
             font-size: 0.9em;
             opacity: 0.95;
         }
-        
+
         .timeline-container {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
@@ -609,12 +609,12 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             overflow-y: auto;
             position: relative;
         }
-        
+
         .timeline {
             position: relative;
             padding-left: 40px;
         }
-        
+
         .timeline::before {
             content: '';
             position: absolute;
@@ -624,18 +624,18 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             width: 3px;
             background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
         }
-        
+
         .timeline-item {
             position: relative;
             padding-bottom: 30px;
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
+
         .timeline-item:hover {
             transform: translateX(5px);
         }
-        
+
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -649,18 +649,18 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
             transition: all 0.3s;
         }
-        
+
         .timeline-item:hover::before {
             transform: scale(1.3);
             box-shadow: 0 0 0 8px rgba(102, 126, 234, 0.2);
         }
-        
+
         .timeline-item.pinned::before {
             background: #ffd89b;
             border-color: #19547b;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% {
                 box-shadow: 0 0 0 4px rgba(255, 216, 155, 0.4);
@@ -669,13 +669,13 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 box-shadow: 0 0 0 8px rgba(255, 216, 155, 0.1);
             }
         }
-        
+
         .timeline-item.today::before {
             background: #ff6b6b;
             border-color: #ee5a52;
             animation: todayPulse 1.5s infinite;
         }
-        
+
         @keyframes todayPulse {
             0%, 100% {
                 box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.4);
@@ -684,11 +684,11 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 box-shadow: 0 0 0 10px rgba(255, 107, 107, 0.1);
             }
         }
-        
+
         .timeline-item.past {
             opacity: 0.7;
         }
-        
+
         .event-card {
             background: white;
             border-radius: 8px;
@@ -696,30 +696,30 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
         }
-        
+
         .timeline-item:hover .event-card {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
-        
+
         .event-date {
             font-size: 0.9em;
             color: #667eea;
             font-weight: 600;
             margin-bottom: 8px;
         }
-        
+
         .event-description {
             color: #333;
             font-size: 1.1em;
             margin-bottom: 8px;
             line-height: 1.4;
         }
-        
+
         .event-relative {
             font-size: 0.85em;
             color: #666;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -728,18 +728,18 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             font-weight: 600;
             margin-bottom: 8px;
         }
-        
+
         .status-past {
             background: #e8eaf6;
             color: #5c6bc0;
         }
-        
+
         .status-today {
             background: #ffebee;
             color: #e53935;
             animation: todayBadgePulse 2s infinite;
         }
-        
+
         @keyframes todayBadgePulse {
             0%, 100% {
                 background: #ffebee;
@@ -748,12 +748,12 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 background: #ffcdd2;
             }
         }
-        
+
         .status-upcoming {
             background: #e8f5e9;
             color: #43a047;
         }
-        
+
         .pin-button {
             background: transparent;
             border: 2px solid #667eea;
@@ -766,32 +766,32 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             transition: all 0.3s;
             margin-top: 8px;
         }
-        
+
         .pin-button:hover {
             background: #667eea;
             color: white;
         }
-        
+
         .pin-button.pinned {
             background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
             border-color: #19547b;
             color: white;
         }
-        
+
         ::-webkit-scrollbar {
             width: 10px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 10px;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
@@ -800,12 +800,12 @@ func exportToHTML(dates []InterestingDate, filename string) error {
 <body>
     <div class="container">
         <h1>✨ Anniversaries Timeline ✨</h1>
-        
+
         <div class="pinned-events" id="pinnedEvents">
             <h2>📌 Pinned Events</h2>
             <div id="pinnedList"></div>
         </div>
-        
+
         <div class="timeline-container">
             <div class="timeline" id="timeline">
 `)
@@ -865,16 +865,16 @@ func exportToHTML(dates []InterestingDate, filename string) error {
             </div>
         </div>
     </div>
-    
+
     <script>
         const pinnedEvents = new Set();
-        
+
         function togglePin(button) {
             const item = button.closest('.timeline-item');
             const date = item.dataset.date;
             const description = item.querySelector('.event-description').textContent;
             const days = parseInt(item.dataset.days);
-            
+
             if (pinnedEvents.has(date)) {
                 pinnedEvents.delete(date);
                 item.classList.remove('pinned');
@@ -886,28 +886,28 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 button.classList.add('pinned');
                 button.textContent = '✓ Pinned';
             }
-            
+
             updatePinnedDisplay();
             savePinnedToStorage();
         }
-        
+
         function updatePinnedDisplay() {
             const pinnedList = document.getElementById('pinnedList');
             const pinnedEventsContainer = document.getElementById('pinnedEvents');
-            
+
             if (pinnedEvents.size === 0) {
                 pinnedEventsContainer.classList.remove('visible');
                 return;
             }
-            
+
             pinnedEventsContainer.classList.add('visible');
             pinnedList.innerHTML = '';
-            
+
             // Get currently visible items in viewport
             const timeline = document.querySelector('.timeline-container');
             const timelineRect = timeline.getBoundingClientRect();
             const items = document.querySelectorAll('.timeline-item');
-            
+
             let visibleDays = null;
             items.forEach(item => {
                 const rect = item.getBoundingClientRect();
@@ -917,22 +917,22 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                     }
                 }
             });
-            
+
             // Display pinned events with relative time
             pinnedEvents.forEach(date => {
                 // Use Array.from to safely search for elements by data attribute
                 const items = Array.from(document.querySelectorAll('.timeline-item'));
                 const item = items.find(el => el.dataset.date === date);
                 if (!item) return;
-                
+
                 const description = item.querySelector('.event-description').textContent;
                 const days = parseInt(item.dataset.days);
-                
+
                 let relativeText = '';
                 if (visibleDays !== null && days !== visibleDays) {
                     const diff = days - visibleDays;
                     const absDiff = Math.abs(diff);
-                    
+
                     if (absDiff === 0) {
                         relativeText = 'Same day';
                     } else if (absDiff === 1) {
@@ -947,7 +947,7 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                         relativeText = diff > 0 ? '+' + years + ' year' + (years > 1 ? 's' : '') : '-' + years + ' year' + (years > 1 ? 's' : '');
                     }
                 }
-                
+
                 const pinnedDiv = document.createElement('div');
                 pinnedDiv.className = 'pinned-event';
                 // Use textContent for safer DOM manipulation
@@ -961,11 +961,11 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 pinnedList.appendChild(pinnedDiv);
             });
         }
-        
+
         function savePinnedToStorage() {
             localStorage.setItem('pinnedEvents', JSON.stringify([...pinnedEvents]));
         }
-        
+
         function loadPinnedFromStorage() {
             const saved = localStorage.getItem('pinnedEvents');
             if (saved) {
@@ -985,18 +985,18 @@ func exportToHTML(dates []InterestingDate, filename string) error {
                 updatePinnedDisplay();
             }
         }
-        
+
         // Update pinned display on scroll
         document.querySelector('.timeline-container').addEventListener('scroll', () => {
             if (pinnedEvents.size > 0) {
                 updatePinnedDisplay();
             }
         });
-        
+
         // Scroll to today on load
         window.addEventListener('load', () => {
             loadPinnedFromStorage();
-            
+
             const todayItem = document.querySelector('.timeline-item.today');
             if (todayItem) {
                 todayItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1018,7 +1018,7 @@ func main() {
 
 	flag.StringVar(&configFile, "config", "anniversaries.yaml", "Path to config YAML file")
 	flag.StringVar(&configFile, "c", "anniversaries.yaml", "Path to config YAML file (shorthand)")
-	flag.StringVar(&icalFile, "ical", "", "Path to export iCal file (optional)")
+	flag.StringVar(&icalFile, "ical", "", "Path to export iCal (.ics) file (optional)")
 	flag.StringVar(&htmlFile, "html", "", "Path to export HTML timeline file (optional)")
 	flag.Parse()
 

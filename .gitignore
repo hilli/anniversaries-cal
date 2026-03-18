@@ -1,3 +1,7 @@
 anniversaries-cal
 *.test
 *.out
+.task/
+anniversaries.hilli.yaml
+cal.html
+cal.ics

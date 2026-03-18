@@ -31,7 +31,7 @@ run = "./$BINARY -c $CONFIG"
 [tasks."run:html"]
 description = "Build and generate HTML + iCal output"
 depends = ["build"]
-run = "./$BINARY -c $CONFIG -html cal.html -ical cal.ical"
+run = "./$BINARY -c $CONFIG -html cal.html -ical cal.ics"
 
 [tasks.check]
 description = "Lint and test"
